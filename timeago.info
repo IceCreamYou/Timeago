@@ -1,0 +1,3 @@
+; $Id$
+name = Time ago
+description = Displays a date in a 'x time ago' kind of way

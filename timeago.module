@@ -1,0 +1,164 @@
+<?php
+/* $Id$ */
+
+/**
+* Display help and module information
+* @param section which section of the site we're displaying help 
+* @return help text for section
+*/
+function timeago_help($section='') {
+
+  $output = '';
+
+  switch ($section) {
+    case "admin/help#description":
+    $output = t("Displays a date in a 'x time ago' kind of way");
+    break;
+  }
+
+  return $output;
+} // function timeago_help
+
+function timeago_menu() {
+
+  $items = array();
+
+  $items[] = array(
+    'path' => 'admin/settings/timeago',
+    'title' => t('Time ago settings'),
+    'callback' => 'drupal_get_form',
+    'callback arguments' => 'timeago_admin',
+    'access' => user_access('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  return $items;
+}
+
+/**
+* Works out the time since the date provided.
+* @param the date in unix time format
+* @return the time since today
+*/
+function timeago_prepare($original, $startdate, $later = false, $round = 3, $maxseconds = 32556926, $dateformat = 'medium') {
+	// array of time period chunks
+	$chunks = array(
+		array(60 * 60 * 24 * 365 , t("year"), t("years")),
+		array(60 * 60 * 24 * 30 , t("month"), t("months")),
+		array(60 * 60 * 24 * 7, t("week"), t("weeks")),
+		array(60 * 60 * 24 , t("day"), t("days")),
+		array(60 * 60 , t("hour"), t("hours")),
+		array(60 , t("minute"), t("minutes")),
+		array(1 , t("second"), t("seconds"))
+	);
+
+  if($later) {
+    $since = $original - $startdate;
+  } else {
+	  $since = $startdate - $original;
+  }
+	$print = '';
+
+	if($since < $maxseconds) {
+		// Loop trough all the chunks
+		$times     = 1;
+		$totaltime = 0;
+		for ($i = 0, $j = count($chunks); $i < $j; $i++) {
+  	
+			$seconds    = $chunks[$i][0];
+			$name       = $chunks[$i][1];
+			$pluralname = $chunks[$i][2];
+  	
+			if (($count = floor(($since - $totaltime) / $seconds)) != 0 && $times <= $round) {
+				if($times == 1) {
+					$print .= ($count == 1) ? '1 '.$name : "$count {$pluralname}";
+				} else {
+					$print .= ($count == 1) ? ', 1 '.$name : ", $count {$pluralname}";
+					
+				}
+				$times++;
+				$totaltime += $count * $seconds;
+				
+			}
+				
+		}
+		if($later) {
+		  return t('%a later', array('%a' => $print));
+		} else {
+		  return t('%a ago', array('%a' => $print));
+	  }
+	} else {
+		return t('on %a', array('%a' => format_date($original, $dateformat)));
+	}
+	
+} // function timeago_prepare
+
+function theme_timeago_posted($postdate, $timeago) {
+	$theme_content = '';
+	$theme_content .= t('Posted !a', array('!a' => '<span class="timeago" title="'. $postdate .'">'. $timeago .'</span>'));
+	return $theme_content;
+} // function theme_timeago_posted
+
+/**
+ * hook_nodeapi implementation
+ *
+ * @ingroup event_nodeapi
+ */
+function timeago_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+	switch ($op) {
+		case 'load':
+			return array(
+        'timeago' => theme('timeago_posted', format_date($node->created, variable_get('timeago_node_dateformat_title', 'large')), timeago_prepare($node->created, time(), false, variable_get('timeago_node_round', 3),variable_get('timeago_node_maxdate', '32556926'),'medium'))
+			);
+      break;
+	}
+} // function timeago_nodeapi
+
+/**
+ * Module configuration settings
+ * @return settings HTML or deny access
+ */
+function timeago_admin() { 
+  // only administrators can access this module
+  if (!user_access("access administration pages")) {
+    return message_access(); 
+  }
+
+	
+  $form['timeago_node'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Time ago node settings'),
+    '#description' => t('Enter date format, max time and number of parts to display for a node.'),
+  );
+  $form['timeago_node']["timeago_node_dateformat_title"] = array(
+        '#type' => 'radios',
+			  '#title' => t('Date format of title'),
+			  '#description' => t('The date you will see when you hover over the date.'),
+			  '#default_value' => variable_get('timeago_node_dateformat_title', 'large'),
+			  '#options' => array('small' => 'Small', 'medium' => 'Medium', 'large' => 'Large')
+	);
+	$form['timeago_node']["timeago_node_dateformat_view"] = array(
+	      '#type' => 'radios',
+			  '#title' => t('Date format when showing the normal date'),
+			  '#description' => t('This setting kicks in when the number of seconds that you set below are exceeded.'),
+			  '#default_value' => variable_get('timeago_node_dateformat_view', 'medium'),
+			  '#options' => array('small' => 'Small', 'medium' => 'Medium', 'large' => 'Large')
+	);
+	$form['timeago_node']["timeago_node_maxdate"] = array(
+	      '#type' => 'textfield',
+			  '#title' => t('Number of seconds before it shows a normal date'),
+			  '#default_value' => variable_get('timeago_node_maxdate', '32556926')
+	);
+	$form['timeago_node']["timeago_node_round"] = array(
+	      '#type' => 'radios',
+			  '#title' => t('Number of parts to show'),
+			  '#default_value' => variable_get('timeago_node_round', 3),
+			  '#options' => array(1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5', 6 => '6', 7 => '7')
+	);
+				
+  
+  return system_settings_form($form);
+	
+} // function timeago_settings
+
+?>
