@@ -115,6 +115,21 @@ function timeago_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
 } // function timeago_nodeapi
 
 /**
+ * hook_comment implementation
+ *
+ * Sets $comment->timeago available in comment.tpl.php
+ */
+function timeago_comment(&$comment, $op) {
+  switch($op) {
+    case 'view':
+      $timeago = theme('timeago_posted', format_date($comment->timestamp, variable_get('timeago_node_dateformat_title', 'large')), timeago_prepare($comment->timestamp, time(), false, variable_get('timeago_node_round', 3),variable_get('timeago_node_maxdate', '32556926'),'medium'));
+
+      $comment->timeago = $timeago;
+			break;
+  }
+}
+
+/**
  * Module configuration settings
  * @return settings HTML or deny access
  */
