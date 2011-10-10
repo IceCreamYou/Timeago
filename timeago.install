@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ *   (Un)installs the Timeago module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function timeago_requirements($phase) {
+  $t = get_t();
+  $requirements = array('timeago' => array(
+    'title' => $t('Time ago library'),
+    'value' => '0.9.3',
+  ));
+  $exists = file_exists(drupal_get_path('module', 'timeago') . '/jquery.timeago.js');
+  if ($exists) {
+    $requirements['timeago']['description'] = $t('Library exists.');
+    $requirements['timeago']['severity'] = REQUIREMENT_OK;
+  }
+  else {
+    $requirements['timeago']['description'] = $t('Library does not exist. <a href="http://timeago.yarp.com/jquery.timeago.js">Download the library</a> and put it in the timeago module folder.');
+    $requirements['timeago']['severity'] = ($phase == 'runtime' ? REQUIREMENT_ERROR : REQUIREMENT_WARNING);
+  }
+  return $requirements;
+}

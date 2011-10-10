@@ -1,178 +1,161 @@
 <?php
 
 /**
-* Display help and module information
-* @param section which section of the site we're displaying help 
-* @return help text for section
-*/
-function timeago_help($section='') {
+ * @file
+ *   Adds support for the Timeago jQuery library.
+ */
 
-  $output = '';
-
-  switch ($section) {
-    case "admin/help#description":
-    $output = t("Displays a date in a 'x time ago' kind of way");
-    break;
+/**
+ * Converts a timestamp into a Timeago date.
+ *
+ * @param $timestamp
+ *   A UNIX timestamp.
+ * @param $date
+ *   (Optional) A human-readable date (will be displayed if JS is disabled).
+ *   If not provided, the site default date format is used.
+ * @return
+ *   HTML representing a Timeago-friendly date.
+ */
+function timeago_format_date($timestamp, $date = NULL) {
+  drupal_add_library('timeago', 'timeago');
+  if (!isset($date)) {
+    $date = format_date($timestamp);
   }
+  $elem = variable_get('timeago_elem', 'abbr');
+  $time = format_date($timestamp, 'custom', 'c');
+  if ($elem == 'abbr') {
+    return '<abbr class="timeago" title="'. $time .'">'. $date .'</abbr>';
+  }
+  elseif ($elem == 'time') {
+    return '<time class="timeago" datetime="'. $time .'">'. $date .'</time>';
+  }
+  return $date;
+}
 
-  return $output;
-} // function timeago_help
-
+/**
+ * Implementation of hook_menu().
+ */
 function timeago_menu() {
-
   $items = array();
-
-  $items[] = array(
-    'path' => 'admin/settings/timeago',
-    'title' => t('Time ago settings'),
-    'callback' => 'drupal_get_form',
-    'callback arguments' => 'timeago_admin',
-    'access' => user_access('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
-   );
-
+  $items['admin/config/user-interface/timeago'] = array(
+    'title' => 'timeago',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('timeago_admin'),
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Allows administrators to adjust settings for timeago.',
+  );
   return $items;
 }
 
 /**
-* Works out the time since the date provided.
-* @param the date in unix time format
-* @return the time since today
-*/
-function timeago_prepare($original, $startdate, $later = false, $round = 3, $maxseconds = 32556926, $dateformat = 'medium') {
-	// array of time period chunks
-	$chunks = array(
-		array(60 * 60 * 24 * 365 , t("year"), t("years")),
-		array(60 * 60 * 24 * 30 , t("month"), t("months")),
-		array(60 * 60 * 24 * 7, t("week"), t("weeks")),
-		array(60 * 60 * 24 , t("day"), t("days")),
-		array(60 * 60 , t("hour"), t("hours")),
-		array(60 , t("minute"), t("minutes")),
-		array(1 , t("second"), t("seconds"))
-	);
-
-  if($later) {
-    $since = $original - $startdate;
-  } else {
-	  $since = $startdate - $original;
-  }
-	$print = '';
-
-	if($since < $maxseconds) {
-		// Loop trough all the chunks
-		$times     = 1;
-		$totaltime = 0;
-		for ($i = 0, $j = count($chunks); $i < $j; $i++) {
-  	
-			$seconds    = $chunks[$i][0];
-			$name       = $chunks[$i][1];
-			$pluralname = $chunks[$i][2];
-  	
-			if (($count = floor(($since - $totaltime) / $seconds)) != 0 && $times <= $round) {
-				if($times == 1) {
-					$print .= ($count == 1) ? '1 '.$name : "$count {$pluralname}";
-				} else {
-					$print .= ($count == 1) ? ', 1 '.$name : ", $count {$pluralname}";
-					
-				}
-				$times++;
-				$totaltime += $count * $seconds;
-				
-			}
-				
-		}
-		if($later) {
-		  return t('%a later', array('%a' => $print));
-		} else {
-		  return t('%a ago', array('%a' => $print));
-	  }
-	} else {
-		return t('on %a', array('%a' => format_date($original, $dateformat)));
-	}
-	
-} // function timeago_prepare
-
-function theme_timeago_posted($postdate, $timeago) {
-	$theme_content = '';
-	$theme_content .= t('Posted !a', array('!a' => '<span class="timeago" title="'. $postdate .'">'. $timeago .'</span>'));
-	return $theme_content;
-} // function theme_timeago_posted
+ * The administrative settings form.
+ */
+function timeago_admin(&$form, $form_state) {
+  $form['timeago_node'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use timeago for node creation dates'),
+    '#default_value' => variable_get('timeago_node', 1),
+  );
+  $form['timeago_comment'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use timeago for comment creation/changed dates'),
+    '#default_value' => variable_get('timeago_comment', 1),
+  );
+  $form['timeago_elem'] = array(
+    '#type' => 'radios',
+    '#title' => t('Time element'),
+    '#default_value' => variable_get('timeago_elem', 'abbr'),
+    '#options' => array(
+      'abbr' => t('abbr (most widely compatible)'),
+      'time' => t('time (HTML5 only)'),
+    ),
+  );
+  return system_settings_form($form);
+}
 
 /**
- * hook_nodeapi implementation
- *
- * @ingroup event_nodeapi
+ * Implements hook_library().
  */
-function timeago_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
-	switch ($op) {
-		case 'load':
-			return array(
-        'timeago' => theme('timeago_posted', format_date($node->created, variable_get('timeago_node_dateformat_title', 'large')), timeago_prepare($node->created, time(), false, variable_get('timeago_node_round', 3),variable_get('timeago_node_maxdate', '32556926'),'medium'))
-			);
-      break;
-	}
-} // function timeago_nodeapi
+function timeago_library() {
+  $path = drupal_get_path('module', 'timeago');
+  return array(
+    'timeago' => array(
+      'title' => t('Time ago'),
+      'website' => 'http://timeago.yarp.com/',
+      'version' => '0.9.3',
+      'js' => array(
+        $path . '/jquery.timeago.js' => array(),
+        $path . '/timeago.js' => array(),
+      ),
+    ),
+  );
+}
 
 /**
- * hook_comment implementation
+ * Implements hook_process_node().
  *
- * Sets $comment->timeago available in comment.tpl.php
+ * We have to use process instead of preprocess because some themes (notably
+ * bartik) override $variables['submitted'] in their preprocess implementations
+ * which can result in something like "published by admin on 10 minutes ago."
  */
-function timeago_comment(&$comment, $op) {
-  switch($op) {
-    case 'view':
-      $timeago = theme('timeago_posted', format_date($comment->timestamp, variable_get('timeago_node_dateformat_title', 'large')), timeago_prepare($comment->timestamp, time(), false, variable_get('timeago_node_round', 3),variable_get('timeago_node_maxdate', '32556926'),'medium'));
-
-      $comment->timeago = $timeago;
-			break;
+function timeago_process_node(&$variables) {
+  if (variable_get('timeago_node', 1)) {
+    $node = $variables['node'];
+    $variables['date'] = timeago_format_date($node->created, $variables['date']);
+    if (variable_get('node_submitted_' . $node->type, TRUE)) {
+      $variables['submitted'] = t('Submitted by !username !datetime', array('!username' => $variables['name'], '!datetime' => $variables['date']));
+    }
   }
 }
 
 /**
- * Module configuration settings
- * @return settings HTML or deny access
+ * Implements hook_preprocess_comment().
  */
-function timeago_admin() { 
-  // only administrators can access this module
-  if (!user_access("access administration pages")) {
-    return message_access(); 
+function timeago_preprocess_comment(&$variables) {
+  if (variable_get('timeago_comment', 1)) {
+    $comment = $variables['comment'];
+    $variables['created'] = timeago_format_date($comment->created, $variables['created']);
+    $variables['changed'] = timeago_format_date($comment->changed, $variables['changed']);
+    $variables['submitted'] = t('Submitted by !username !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
   }
+}
 
-	
-  $form['timeago_node'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Time ago node settings'),
-    '#description' => t('Enter date format, max time and number of parts to display for a node.'),
+/**
+ * Implements hook_token_info().
+ */
+function timeago_token_info() {
+  $return['tokens']['node']['timeago'] = array(
+    'name' => t('Created time ago'),
+    'description' => t('The amount of time ago the node was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
   );
-  $form['timeago_node']["timeago_node_dateformat_title"] = array(
-        '#type' => 'radios',
-			  '#title' => t('Date format of title'),
-			  '#description' => t('The date you will see when you hover over the date.'),
-			  '#default_value' => variable_get('timeago_node_dateformat_title', 'large'),
-			  '#options' => array('small' => 'Small', 'medium' => 'Medium', 'large' => 'Large')
-	);
-	$form['timeago_node']["timeago_node_dateformat_view"] = array(
-	      '#type' => 'radios',
-			  '#title' => t('Date format when showing the normal date'),
-			  '#description' => t('This setting kicks in when the number of seconds that you set below are exceeded.'),
-			  '#default_value' => variable_get('timeago_node_dateformat_view', 'medium'),
-			  '#options' => array('small' => 'Small', 'medium' => 'Medium', 'large' => 'Large')
-	);
-	$form['timeago_node']["timeago_node_maxdate"] = array(
-	      '#type' => 'textfield',
-			  '#title' => t('Number of seconds before it shows a normal date'),
-			  '#default_value' => variable_get('timeago_node_maxdate', '32556926')
-	);
-	$form['timeago_node']["timeago_node_round"] = array(
-	      '#type' => 'radios',
-			  '#title' => t('Number of parts to show'),
-			  '#default_value' => variable_get('timeago_node_round', 3),
-			  '#options' => array(1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5', 6 => '6', 7 => '7')
-	);
-				
-  
-  return system_settings_form($form);
-	
-} // function timeago_settings
+  $return['tokens']['comment']['created-timeago'] = array(
+    'name' => t('Created time ago'),
+    'description' => t('The amount of time ago the comment was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
+  );
+  $return['tokens']['comment']['changed-timeago'] = array(
+    'name' => t('Created time ago'),
+    'description' => t('The amount of time ago the comment was changed. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
+  );
+  return $return;
+}
 
-?>
+/**
+ * Implements hook_tokens().
+ */
+function timeago_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'node' && !empty($data['node']) && isset($tokens['timeago'])) {
+    $node = (object) $data['node'];
+    $replacements[$tokens['timeago']] = timeago_format_date($node->created);
+  }
+  if ($type == 'comment' && !empty($data['comment'])) {
+    $comment = (object) $data['comment'];
+    if (isset($tokens['created-timeago'])) {
+      $replacements[$tokens['created-timeago']] = timeago_format_date($comment->created);
+    }
+    if (isset($tokens['changed-timeago'])) {
+      $replacements[$tokens['changed-timeago']] = timeago_format_date($comment->changed);
+    }
+  }
+  return $replacements;
+}
