@@ -33,7 +33,7 @@ function timeago_format_date($timestamp, $date = NULL) {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function timeago_menu() {
   $items = array();
