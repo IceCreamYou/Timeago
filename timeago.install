@@ -25,3 +25,12 @@ function timeago_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function timeago_uninstall() {
+  variable_del('timeago_node');
+  variable_del('timeago_comment');
+  variable_del('timeago_elem');
+}
