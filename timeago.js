@@ -1,6 +1,6 @@
 Drupal.behaviors.timeago = {
   attach: function (context) {
-    jQuery('abbr.timeago, time.timeago', context).timeago();
+    jQuery('abbr.timeago, span.timeago, time.timeago', context).timeago();
   }
 }
 

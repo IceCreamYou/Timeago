@@ -21,13 +21,13 @@ function timeago_format_date($timestamp, $date = NULL) {
   if (!isset($date)) {
     $date = format_date($timestamp);
   }
-  $elem = variable_get('timeago_elem', 'abbr');
+  $elem = variable_get('timeago_elem', 'span');
   $time = format_date($timestamp, 'custom', 'c');
-  if ($elem == 'abbr') {
-    return '<abbr class="timeago" title="'. $time .'">'. $date .'</abbr>';
-  }
-  elseif ($elem == 'time') {
+  if ($elem == 'time') {
     return '<time class="timeago" datetime="'. $time .'">'. $date .'</time>';
+  }
+  else {
+    return '<'. $elem .' class="timeago" title="'. $time .'">'. $date .'</abbr>';
   }
   return $date;
 }
@@ -64,9 +64,10 @@ function timeago_admin(&$form, $form_state) {
   $form['timeago_elem'] = array(
     '#type' => 'radios',
     '#title' => t('Time element'),
-    '#default_value' => variable_get('timeago_elem', 'abbr'),
+    '#default_value' => variable_get('timeago_elem', 'span'),
     '#options' => array(
-      'abbr' => t('abbr (most widely compatible)'),
+      'span' => t('span'),
+      'abbr' => t('abbr'),
       'time' => t('time (HTML5 only)'),
     ),
   );

@@ -28,7 +28,7 @@ http://timeago.yarp.com/
  - An option to turn node created times into timeago dates
  - An option to turn comment created/changed times into timeago dates
  - Tokens for node created time and comment created/changed times
- - An option to use the new HTML5 "time" element (otherwise uses abbr)
+ - An option to use the new HTML5 "time" element, abbr, or span
  - An API to turn any UNIX timestamp into a timeago date
 
 
@@ -41,6 +41,7 @@ a timeago-compatible HTML element like below and adding the Timeago JavaScript
 to the page by calling drupal_add_library('timeago', 'timeago');
 
   <abbr class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</abbr>
+  <span class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</span>
   <time class="timeago" datetime="2008-07-17T09:24:17Z">July 17, 2008</time>
 
 The <time> tag is new in HTML5. The markup above will be turned into something
