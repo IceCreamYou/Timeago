@@ -50,7 +50,7 @@ function timeago_menu() {
 /**
  * The administrative settings form.
  */
-function timeago_admin(&$form, $form_state) {
+function timeago_admin($form, $form_state) {
   $form['timeago_node'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use timeago for node creation dates'),
