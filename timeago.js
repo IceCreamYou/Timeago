@@ -5,12 +5,10 @@ Drupal.behaviors.timeago = {
 }
 
 /**
- * This allows translating string suffixes. Some languages (Arabic, Polish,
- * Russian, Ukranian, etc.) have different suffixes depending on the numbers
- * used; unfortunately we don't support those languages natively because as far
- * as I can tell Drupal doesn't have a good way to handle this kind of thing.
- * However, if you need support for these languages, you can override the
- * settings Timeago uses; see https://gist.github.com/6251 for details.
+ * This allows translating string suffixes through Drupal. Some languages
+ * (Arabic, Polish, Russian, Ukranian, etc.) have different suffixes depending
+ * on the numbers used; see the note on Translation in the README.txt for how
+ * to override the translations for these languages.
  */
 jQuery.timeago.settings.strings = {
   prefixAgo: null,

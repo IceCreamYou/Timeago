@@ -38,7 +38,7 @@ http://timeago.yarp.com/
 
 If you want to manually construct a Timeago date, you can do so by creating
 a timeago-compatible HTML element like below and adding the Timeago JavaScript
-to the page by calling drupal_add_library('timeago', 'timeago');
+to the page by calling timeago_add_js();
 
   <abbr class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</abbr>
   <span class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</span>
@@ -77,11 +77,16 @@ function timeago_format_date($timestamp, $date = NULL)
 This module produces strings like "a moment ago" and "10 minutes ago" using
 JavaScript, and these strings are passed through Drupal.t(), so they are
 translate-able for most languages. However, some languages (Arabic, Polish,
-Russian, Ukranian, etc.) have different suffixes depending on the numbers used;
-unfortunately we don't support those languages natively because as far as I can
-tell Drupal doesn't have a good way to handle this kind of thing. However, if
-you need support for these languages, you can override the settings Timeago
-uses in JavaScript. See https://gist.github.com/6251 for details.
+Russian, Ukranian, etc.) have different suffixes depending on the numbers used.
+If you need support for these languages, you can override the settings Timeago
+uses in JavaScript by providing a translation override file. Examples of such
+files are available at https://gist.github.com/6251 for various languages. You
+should choose a translation or write your own and save it in a file named
+jquery.timeago.LANGCODE.js, where LANGCODE is a language identifier code like
+ar, pl, ru, or uk (for Arabic, Polish, Russian, and Ukranian, respectively).
+This translation file should be placed in the module's folder, e.g. at
+/sites/all/modules/timeago/jquery.timeago.ru.js for Russian. The appropriate
+translation override file will be automatically added to the page if necessary.
 
 
 ==========

@@ -17,7 +17,7 @@
  *   HTML representing a Timeago-friendly date.
  */
 function timeago_format_date($timestamp, $date = NULL) {
-  drupal_add_library('timeago', 'timeago');
+  timeago_add_js();
   if (!isset($date)) {
     $date = format_date($timestamp);
   }
@@ -159,4 +159,22 @@ function timeago_tokens($type, $tokens, array $data = array(), array $options = 
     }
   }
   return $replacements;
+}
+
+/**
+ * Overrides the default translation of Timeago dates if necessary.
+ */
+function timeago_add_js() {
+  // Add the Timeago library, the module's helper JS, and the default Drupal
+  // translation of Timeago date terms.
+  drupal_add_library('timeago', 'timeago');
+  // Some languages (Arabic, Polish, Russian, Ukranian, etc.) have different
+  // suffixes depending on the numbers used in the dates, so we may need to
+  // have more complex translations than Drupal allows. To support these cases,
+  // we allow adding a script that will override the translations. Examples
+  // are available at https://gist.github.com/6251.
+  $path = drupal_get_path('module', 'timeago') . '/jquery.timeago.' . $GLOBALS['language']->language . '.js';
+  if (file_exists($path)) {
+    drupal_add_js($path);
+  }
 }
