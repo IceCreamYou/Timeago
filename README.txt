@@ -36,9 +36,23 @@ http://timeago.yarp.com/
   API
 =======
 
+The easiest way to construct a Timeago date is to use timeago_format_date():
+
+/**
+ * Converts a timestamp into a Timeago date.
+ *
+ * @param $timestamp
+ *   A UNIX timestamp.
+ * @param $date
+ *   (Optional) A human-readable date (will be displayed if JS is disabled).
+ *   If not provided, the site default date format is used.
+ * @return
+ *   HTML representing a Timeago-friendly date.
+ */
+function timeago_format_date($timestamp, $date = NULL)
+
 If you want to manually construct a Timeago date, you can do so by creating
-a timeago-compatible HTML element like below and adding the Timeago JavaScript
-to the page by calling timeago_add_js();
+a timeago-compatible HTML element like below:
 
   <abbr class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</abbr>
   <span class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</span>
@@ -53,21 +67,8 @@ The timestamp in the title/datetime attribute is what the Timeago plugin uses
 to calculate the time ago. It must be in ISO-8601 format. The easiest way to
 get a date in that format is to call format_date($timestamp, 'custom', 'c');
 
-If you don't want to go to the trouble of constructing the markup on your own,
-this module provides an easier way: timeago_format_date().
-
-/**
- * Converts a timestamp into a Timeago date.
- *
- * @param $timestamp
- *   A UNIX timestamp.
- * @param $date
- *   (Optional) A human-readable date (will be displayed if JS is disabled).
- *   If not provided, the site default date format is used.
- * @return
- *   HTML representing a Timeago-friendly date.
- */
-function timeago_format_date($timestamp, $date = NULL)
+NOTE: if you construct a Timeago date manually, you also need to manually
+add the Timeago JavaScript to the page by calling timeago_add_js().
 
 
 ===============
