@@ -31,6 +31,9 @@ http://timeago.yarp.com/
  - An option to use the new HTML5 "time" element, abbr, or span
  - An API to turn any UNIX timestamp into a timeago date
 
+Additionally the Statuses module integrates with Timeago
+(https://drupal.org/project/statuses).
+
 
 =======
   API
