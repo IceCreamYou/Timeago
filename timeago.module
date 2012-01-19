@@ -38,7 +38,7 @@ function timeago_format_date($timestamp, $date = NULL) {
 function timeago_menu() {
   $items = array();
   $items['admin/config/user-interface/timeago'] = array(
-    'title' => 'timeago',
+    'title' => 'Timeago',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('timeago_admin'),
     'access arguments' => array('administer site configuration'),
