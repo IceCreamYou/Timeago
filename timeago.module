@@ -5,6 +5,10 @@
  *   Adds support for the Timeago jQuery library.
  */
 
+define('TIMEAGO_LIBRARY_WEBSITE', 'http://timeago.yarp.com/');
+define('TIMEAGO_LIBRARY_FILENAME', 'jquery.timeago.js');
+define('TIMEAGO_LIBRARY_DOWNLOAD_URL', 'http://timeago.yarp.com/jquery.timeago.js');
+
 /**
  * Converts a timestamp into a Timeago date.
  *
@@ -24,10 +28,10 @@ function timeago_format_date($timestamp, $date = NULL) {
   $elem = variable_get('timeago_elem', 'span');
   $time = format_date($timestamp, 'custom', 'c');
   if ($elem == 'time') {
-    return '<time class="timeago" datetime="'. $time .'">'. $date .'</time>';
+    return '<time class="timeago" datetime="' . $time . '">' . $date . '</time>';
   }
   else {
-    return '<'. $elem .' class="timeago" title="'. $time .'">'. $date .'</abbr>';
+    return '<' . $elem . ' class="timeago" title="' . $time . '">' . $date . '</abbr>';
   }
   return $date;
 }
@@ -82,11 +86,33 @@ function timeago_library() {
   return array(
     'timeago' => array(
       'title' => t('Time ago'),
-      'website' => 'http://timeago.yarp.com/',
-      'version' => '0.9.3',
+      'website' => TIMEAGO_LIBRARY_WEBSITE,
+      'version' => '0.11.1',
       'js' => array(
-        $path . '/jquery.timeago.js' => array(),
+        $path . '/' . TIMEAGO_LIBRARY_FILENAME => array(),
         $path . '/timeago.js' => array(),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function timeago_libraries_info() {
+  return array(
+    'timeago' => array(
+      'name' => t('Time ago'),
+      'vendor url' => TIMEAGO_LIBRARY_WEBSITE,
+      'download url' => TIMEAGO_LIBRARY_DOWNLOAD_URL,
+      'version arguments' => array(
+        'file' => TIMEAGO_LIBRARY_FILENAME,
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@', // e.g. @version 0.10.0
+      ),
+      'files' => array(
+        'js' => array(
+          TIMEAGO_LIBRARY_FILENAME => array(),
+        ),
       ),
     ),
   );
@@ -167,13 +193,22 @@ function timeago_tokens($type, $tokens, array $data = array(), array $options = 
 function timeago_add_js() {
   // Add the Timeago library, the module's helper JS, and the default Drupal
   // translation of Timeago date terms.
-  drupal_add_library('timeago', 'timeago');
+  if (module_exists('libraries')) {
+    $library_path = libraries_get_path('timeago');
+    $path = drupal_get_path('module', 'timeago') . '/timeago.js';
+    drupal_add_js($path);
+    libraries_load('timeago');
+  }
+  else {
+    $library_path = drupal_get_path('module', 'timeago');
+    drupal_add_library('timeago', 'timeago');
+  }
   // Some languages (Arabic, Polish, Russian, Ukranian, etc.) have different
   // suffixes depending on the numbers used in the dates, so we may need to
   // have more complex translations than Drupal allows. To support these cases,
   // we allow adding a script that will override the translations. Examples
   // are available at https://gist.github.com/6251.
-  $path = drupal_get_path('module', 'timeago') . '/jquery.timeago.' . $GLOBALS['language']->language . '.js';
+  $path = $library_path . '/jquery.timeago.' . $GLOBALS['language']->language . '.js';
   if (file_exists($path)) {
     drupal_add_js($path);
   }
