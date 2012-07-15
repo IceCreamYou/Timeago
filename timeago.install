@@ -5,6 +5,15 @@
  *   (Un)installs the Timeago module.
  */
 
+// When the module is first installed, the module file won't be loaded yet.
+// As a result, these constants won't be defined.
+if (!defined('TIMEAGO_LIBRARY_FILENAME')) {
+  define('TIMEAGO_LIBRARY_FILENAME', 'jquery.timeago.js');
+}
+if (!defined('TIMEAGO_LIBRARY_DOWNLOAD_URL')) {
+  define('TIMEAGO_LIBRARY_DOWNLOAD_URL', 'http://timeago.yarp.com/jquery.timeago.js');
+}
+
 /**
  * Implements hook_requirements().
  */
