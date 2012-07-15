@@ -25,14 +25,25 @@ http://timeago.yarp.com/
   FEATURES
 ============
 
- - An option to turn node created times into timeago dates
- - An option to turn comment created/changed times into timeago dates
- - Tokens for node created time and comment created/changed times
+ - The ability to use Timeago dates for virtually any date on the site
+   including node created dates and comment created/changed dates
+ - Tokens for node created dates and comment created/changed dates
  - An option to use the new HTML5 "time" element, abbr, or span
  - An API to turn any UNIX timestamp into a timeago date
 
 Additionally the Statuses module integrates with Timeago
 (https://drupal.org/project/statuses).
+
+To use Timeago dates for virtually every date on your site, visit
+admin/config/regional/date-time. For each date format, you can choose to use
+one of the Timeago formats provided by default, or you can create a new format
+that uses Timeago by visiting admin/config/regional/date-time/formats/add and
+entering a format string like this into the "Format string" box:
+
+<\s\p\a\n \c\l\a\s\s="\t\i\m\e\a\g\o" \t\i\t\l\e="c">D, n/j/Y - g:ia</\s\p\a\n>
+
+More information about how to structure custom formats is available in the API
+section below.
 
 
 =======
