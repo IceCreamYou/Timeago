@@ -27,3 +27,5 @@ jQuery.timeago.settings.strings = {
   year: Drupal.t("about a year"),
   years: Drupal.t("%d years"),
 }
+// Allow timestamps in the future. https://drupal.org/node/1696742
+jQuery.timeago.settings.allowFuture = true;
