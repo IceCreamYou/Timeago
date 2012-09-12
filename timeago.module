@@ -275,7 +275,7 @@ function timeago_tokens($type, $tokens, array $data = array(), array $options = 
 function timeago_add_js() {
   // Add the Timeago library, the module's helper JS, and the default Drupal
   // translation of Timeago date terms.
-  if (module_exists('libraries')) {
+  if (module_exists('libraries') && function_exists('libraries_load')) {
     $library_path = libraries_get_path('timeago');
     $path = drupal_get_path('module', 'timeago') . '/timeago.js';
     drupal_add_js($path);
