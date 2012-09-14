@@ -186,17 +186,19 @@ function timeago_init() {
   // Add the Timeago JS to the page if a date format uses Timeago.
   // This is necessary because by the time we render a date it will be too late
   // to add JS to the page.
-  $short = variable_get('date_format_short', 'm/d/Y - H:i');
-  $medium = variable_get('date_format_medium', 'D, m/d/Y - H:i');
-  $long = variable_get('date_format_long', 'l, F j, Y - H:i');
-  if ($short == TIMEAGO_FORMAT_SHORT_US || $short == TIMEAGO_FORMAT_SHORT) {
-    timeago_add_js();
-  }
-  elseif ($medium == TIMEAGO_FORMAT_MEDIUM_US || $medium == TIMEAGO_FORMAT_MEDIUM) {
-    timeago_add_js();
-  }
-  elseif ($long == TIMEAGO_FORMAT_LONG_US || $long == TIMEAGO_FORMAT_LONG) {
-    timeago_add_js();
+  $date_types = system_get_date_types();
+  foreach ($date_types as $date_type) {
+    $format = variable_get('date_format_' . $date_type['type'], '');
+    switch ($format) {
+      case TIMEAGO_FORMAT_SHORT_US:
+      case TIMEAGO_FORMAT_SHORT:
+      case TIMEAGO_FORMAT_MEDIUM_US:
+      case TIMEAGO_FORMAT_MEDIUM:
+      case TIMEAGO_FORMAT_LONG_US:
+      case TIMEAGO_FORMAT_LONG:
+        timeago_add_js();
+        return;
+    }
   }
 }
 
