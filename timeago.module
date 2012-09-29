@@ -272,6 +272,67 @@ function timeago_tokens($type, $tokens, array $data = array(), array $options = 
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see system_form_user_profile_form_alter()
+ */
+function timeago_form_user_profile_form_alter(&$form, &$form_state) {
+  if ($form['#user_category'] == 'account') {
+    if (variable_get('configurable_timezones', 1)) {
+      $date_format_long = variable_get('date_format_long', 'l, F j, Y - H:i');
+      $date_format = NULL;
+      if ($date_format_long == TIMEAGO_FORMAT_LONG_US) {
+        $date_format = 'l, F j, Y - g:ia';
+      }
+      elseif ($date_format_long = TIMEAGO_FORMAT_LONG) {
+        $date_format = 'l, j F Y - H:i';
+      }
+      if ($date_format) {
+        $form['timezone']['timezone']['#options'] = timeago_time_zones($form['#user']->uid != $GLOBALS['user']->uid, $date_format);
+      }
+    }
+    return $form;
+  }
+}
+
+/**
+ * Generate an array of time zones and their local time & date.
+ *
+ * This function is identical to system_time_zones() except that it allows
+ * specifying a custom date format for the local time and date. This difference
+ * allows using formats other than the default Long date format, which is
+ * important when a Timeago format is the default since that would include
+ * hard-to-read escaped HTML markup.
+ *
+ * @param $blank
+ *   (Optional) If evaluates true, prepend an empty time zone option to the
+ *   array.
+ * @param $date_format
+ *   (Optional) The format of the human-readable date values.
+ *
+ * @return
+ *   An associative array of time zones. Keys are zone IDs and values are the
+ *   current local datetime + UTC offset.
+ *
+ * @see system_time_zones()
+ */
+function timeago_time_zones($blank = NULL, $date_format = '') {
+  $zonelist = timezone_identifiers_list();
+  $zones = $blank ? array('' => t('- None selected -')) : array();
+  foreach ($zonelist as $zone) {
+    // Because many time zones exist in PHP only for backward compatibility
+    // reasons and should not be used, the list is filtered by a regular
+    // expression.
+    if (preg_match('!^((Africa|America|Antarctica|Arctic|Asia|Atlantic|Australia|Europe|Indian|Pacific)/|UTC$)!', $zone)) {
+      $zones[$zone] = t('@zone: @date', array('@zone' => t(str_replace('_', ' ', $zone)), '@date' => format_date(REQUEST_TIME, 'custom', $date_format . ' O', $zone)));
+    }
+  }
+  // Sort the translated time zones alphabetically.
+  asort($zones);
+  return $zones;
+}
+
+/**
  * Overrides the default translation of Timeago dates if necessary.
  */
 function timeago_add_js() {
