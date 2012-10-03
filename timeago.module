@@ -55,7 +55,7 @@ function timeago_format_date($timestamp, $date = NULL) {
     return '<time class="timeago" datetime="' . $time . '">' . $date . '</time>';
   }
   else {
-    return '<' . $elem . ' class="timeago" title="' . $time . '">' . $date . '</abbr>';
+    return '<' . $elem . ' class="timeago" title="' . $time . '">' . $date . '</' . $elem . '>';
   }
   return $date;
 }
