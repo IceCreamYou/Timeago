@@ -19,7 +19,7 @@ if (!defined('TIMEAGO_LIBRARY_DOWNLOAD_URL')) {
  */
 function timeago_requirements($phase) {
   // Path to library
-  if (module_exists('libraries') && $path = libraries_get_path('timeago')) {
+  if (module_exists('libraries') && function_exists('libraries_load') && $path = libraries_get_path('timeago')) {
     $path .= '/' . TIMEAGO_LIBRARY_FILENAME;
   }
   else {
