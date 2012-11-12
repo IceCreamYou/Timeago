@@ -6,8 +6,12 @@
  */
 
 define('TIMEAGO_LIBRARY_WEBSITE', 'http://timeago.yarp.com/');
-define('TIMEAGO_LIBRARY_FILENAME', 'jquery.timeago.js');
-define('TIMEAGO_LIBRARY_DOWNLOAD_URL', 'http://timeago.yarp.com/jquery.timeago.js');
+if (!defined('TIMEAGO_LIBRARY_FILENAME')) {
+  define('TIMEAGO_LIBRARY_FILENAME', 'jquery.timeago.js');
+}
+if (!defined('TIMEAGO_LIBRARY_DOWNLOAD_URL')) {
+  define('TIMEAGO_LIBRARY_DOWNLOAD_URL', 'http://timeago.yarp.com/jquery.timeago.js');
+}
 define('TIMEAGO_FORMAT_SHORT_US', '<\s\p\a\n \c\l\a\s\s="\t\i\m\e\a\g\o" \t\i\t\l\e="c">n/j/y - g:ia</\s\p\a\n>');
 define('TIMEAGO_FORMAT_SHORT', '<\s\p\a\n \c\l\a\s\s="\t\i\m\e\a\g\o" \t\i\t\l\e="c">d/m/Y - H:i</\s\p\a\n>');
 define('TIMEAGO_FORMAT_MEDIUM_US', '<\s\p\a\n \c\l\a\s\s="\t\i\m\e\a\g\o" \t\i\t\l\e="c">D, n/j/Y - g:ia</\s\p\a\n>');
