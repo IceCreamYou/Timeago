@@ -1,6 +1,8 @@
+(function ($) {
+
 Drupal.behaviors.timeago = {
   attach: function (context) {
-    jQuery('abbr.timeago, span.timeago, time.timeago', context).timeago();
+    $('abbr.timeago, span.timeago, time.timeago', context).timeago();
   }
 };
 
@@ -10,7 +12,7 @@ Drupal.behaviors.timeago = {
  * on the numbers used; see the note on Translation in the README.txt for how
  * to override the translations for these languages.
  */
-jQuery.timeago.settings.strings = {
+$.timeago.settings.strings = {
   prefixAgo: null,
   prefixFromNow: null,
   suffixAgo: Drupal.t("ago"),
@@ -28,4 +30,6 @@ jQuery.timeago.settings.strings = {
   years: Drupal.t("%d years")
 };
 // Allow timestamps in the future. https://drupal.org/node/1696742
-jQuery.timeago.settings.allowFuture = true;
+$.timeago.settings.allowFuture = true;
+
+})(jQuery);
