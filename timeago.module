@@ -121,10 +121,10 @@ function timeago_admin($form, $form_state) {
   $form['settings']['timeago_js_refresh_millis'] = array(
     '#type' => 'textfield',
     '#title' => t('Refresh Timeago dates after'),
-    '#required' => TRUE,
+    '#description' => t('Timeago can update its dates without a page refresh at this interval. Leave blank or set to zero to never refresh Timeago dates.'),
     '#default_value' => variable_get('timeago_js_refresh_millis', 60000),
     '#field_suffix' => ' ' . t('milliseconds'),
-    '#element_validate' => array('element_validate_integer'),
+    '#element_validate' => array('timeago_validate_empty_or_nonnegative_integer'),
   );
 
   $form['settings']['timeago_js_allow_future'] = array(
@@ -144,9 +144,9 @@ function timeago_admin($form, $form_state) {
     '#type' => 'textfield',
     '#title' => t('Do not use Timeago dates after'),
     '#field_suffix' => ' '. t('milliseconds'),
-    '#description' => t('Leave blank to always use Timeago dates.'),
+    '#description' => t('Leave blank or set to zero to always use Timeago dates.'),
     '#default_value' => variable_get('timeago_js_cutoff', ''),
-    '#element_validate' => array('timeago_validate_empty_or_integer_positive'),
+    '#element_validate' => array('timeago_validate_empty_or_nonnegative_integer'),
   );
 
   $form['settings']['strings'] = array(
@@ -158,7 +158,7 @@ function timeago_admin($form, $form_state) {
 
   if (timeago_library_detect_languages()) {
     $form['settings']['strings']['warning'] = array(
-      '#markup' => '<div class="messages warning">' . t('JavaScript translation files have been detected in the Timeago library. The following settings will not be used unless you remove them.') . '</div>',
+      '#markup' => '<div class="messages warning">' . t('JavaScript translation files have been detected in the Timeago library. The following settings will not be used unless you remove those files.') . '</div>',
     );
   }
 
@@ -186,13 +186,12 @@ function timeago_admin($form, $form_state) {
 }
 
 /**
- * Form element validation handler for blank elements or integer elements that
- * must be positive.
+ * Validates that a form element's value is blank or a nonzero integer.
  */
-function timeago_validate_empty_or_integer_positive($element, &$form_state) {
+function timeago_validate_empty_or_nonnegative_integer($element, &$form_state) {
   $value = $element['#value'];
-  if (!($value === '' || is_numeric($value) && intval($value) == $value && $value > 0)) {
-    form_error($element, t('%name must be either a positive integer or blank.', array('%name' => $element['#title'])));
+  if (!($value === '' || (is_numeric($value) && intval($value) == $value && $value >= 0))) {
+    form_error($element, t('%name must be either a nonnegative integer or blank.', array('%name' => $element['#title'])));
   }
 }
 
@@ -249,12 +248,10 @@ function timeago_library_detect_languages() {
   // Remove English as the library includes it as an example.
   unset($languages['en']);
 
-  if (!empty($languages)) {
-    foreach ($languages as $lang_code => $language) {
-      if (file_exists($library_path . '/jquery.timeago.' . $lang_code . '.js')) {
-        $library_languages_found = TRUE;
-        break;
-      }
+  foreach ($languages as $lang_code => $language) {
+    if (file_exists($library_path . '/jquery.timeago.' . $lang_code . '.js')) {
+      $library_languages_found = TRUE;
+      break;
     }
   }
 
@@ -418,7 +415,7 @@ function timeago_variable_info($options) {
 
   foreach ($settings_vars as $js_var => $variable) {
     $variables[$variable['variable_name']] = array(
-      'title' => t('Timeago &quot;@title&quot; JavaScript setting', array('@title' => $variable['title']), $options),
+      'title' => t('Timeago JavaScript setting for &quot;@title&quot;', array('@title' => $variable['title']), $options),
       'type' => 'string',
       'default' => $variable['default'],
     );
@@ -483,7 +480,7 @@ function timeago_add_js() {
 
   // Build the settings array structure.
   $settings = array(
-    'refreshMillis' => (int) intval(variable_get('timeago_js_refresh_millis', 60000)),
+    'refreshMillis' => (int) variable_get('timeago_js_refresh_millis', 60000),
     'allowFuture' => (bool) variable_get('timeago_js_allow_future', 1),
     'localeTitle' => (bool) variable_get('timeago_js_locale_title', 0),
     'cutoff' => (int) variable_get('timeago_js_cutoff', ''),
