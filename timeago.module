@@ -186,7 +186,7 @@ function timeago_admin($form, $form_state) {
 }
 
 /**
- * Validates that a form element's value is blank or a nonzero integer.
+ * Validates that a form element's value is blank or a nonnegative integer.
  */
 function timeago_validate_empty_or_nonnegative_integer($element, &$form_state) {
   $value = $element['#value'];
