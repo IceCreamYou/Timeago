@@ -249,7 +249,7 @@ function timeago_library_detect_languages() {
   unset($languages['en']);
 
   foreach ($languages as $lang_code => $language) {
-    if (file_exists($library_path . '/jquery.timeago.' . $lang_code . '.js')) {
+    if (file_exists($library_path . '/locales/jquery.timeago.' . $lang_code . '.js') || file_exists($library_path . '/jquery.timeago.' . $lang_code . '.js')) {
       $library_languages_found = TRUE;
       break;
     }
@@ -491,7 +491,10 @@ function timeago_add_js() {
   // have more complex translations than Drupal allows. To support these cases,
   // we allow adding a script that will override the translations. Examples
   // are available at https://gist.github.com/6251.
-  $path = $library_path . '/jquery.timeago.' . $GLOBALS['language']->language . '.js';
+  $path = $library_path . '/locales/jquery.timeago.' . $GLOBALS['language']->language . '.js';
+  if (!file_exists($path)) {
+    $path = $library_path . '/jquery.timeago.' . $GLOBALS['language']->language . '.js';
+  }
   if (file_exists($path)) {
     drupal_add_js($path, array('weight' => 1));
   }
