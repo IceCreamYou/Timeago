@@ -346,18 +346,26 @@ function timeago_preprocess_comment(&$variables) {
  * Implements hook_token_info().
  */
 function timeago_token_info() {
-  $return['tokens']['node']['timeago'] = array(
-    'name' => t('Created time ago'),
-    'description' => t('The amount of time ago the node was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
-  );
-  $return['tokens']['comment']['created-timeago'] = array(
-    'name' => t('Created time ago'),
-    'description' => t('The amount of time ago the comment was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
-  );
-  $return['tokens']['comment']['changed-timeago'] = array(
-    'name' => t('Created time ago'),
-    'description' => t('The amount of time ago the comment was changed. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
-  );
+  $return = array();
+
+  if (module_exists('node')) {
+    $return['tokens']['node']['timeago'] = array(
+      'name' => t('Created time ago'),
+      'description' => t('The amount of time ago the node was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
+    );
+  }
+
+  if (module_exists('comment')) {
+    $return['tokens']['comment']['created-timeago'] = array(
+      'name' => t('Created time ago'),
+      'description' => t('The amount of time ago the comment was created. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
+    );
+    $return['tokens']['comment']['changed-timeago'] = array(
+      'name' => t('Created time ago'),
+      'description' => t('The amount of time ago the comment was changed. Uses the Timeago module to display the time dynamically with graceful degredation for non-JS users.'),
+    );
+  }
+
   return $return;
 }
 
