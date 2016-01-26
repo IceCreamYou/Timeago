@@ -90,12 +90,18 @@ add the Timeago JavaScript to the page by calling timeago_add_js().
 ===============
 
 This module produces strings like "a moment ago" and "10 minutes ago" using
-JavaScript. To support other languages, you can provide a translation override
-file. Examples of such files are available in the "locales" folder of the
-Timeago library's GitHub project at https://github.com/rmm5t/jquery-timeago.
-Any translation files you use should be placed in the the same folder as the
-Timeago library (jquery.timeago.js), which is typically in the Timeago module's
-folder. For example, you could put the Russian translation file at
+JavaScript. There are two ways to translate these strings.
+
+The first option is to enable the i18n (https://www.drupal.org/project/i18n)
+submodule "i18n_variable" and then set the Timeago variables as translatable at
+/admin/config/regional/i18n/variable.
+
+The second option is to provide a translation override file. Examples of such
+files are available in the "locales" folder of the Timeago library's GitHub
+project at https://github.com/rmm5t/jquery-timeago. Any translation files you
+use should be placed in the the same folder as the Timeago library
+(jquery.timeago.js), which is typically in the Timeago module's folder. For
+example, you could put the Russian translation file at
 /sites/all/modules/timeago/jquery.timeago.ru.js. The appropriate translation
 override file will be automatically added to the page if necessary.
 
